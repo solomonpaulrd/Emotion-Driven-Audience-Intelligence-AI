@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Emotions Analytics Insights Tool</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0d1117; /* Dark background similar to GitHub */
+            color: #c9d1d9; /* Light text */
+            margin: 0;
+            padding: 2rem;
+        }
+        .card {
+            background-color: #161b22; /* Slightly lighter dark for cards */
+            border: 1px solid #30363d; /* Subtle border */
+            border-radius: 0.5rem; /* Rounded corners */
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .header-gradient {
+            background-image: linear-gradient(to right, #34d399, #60a5fa); /* Green to Blue gradient */
+            background-clip: text;
+            color: transparent;
+        }
+        select, input[type="radio"] {
+            accent-color: #60a5fa; /* Blue accent for radio buttons/select */
+        }
+        .button-primary {
+            background-color: #34d399; /* Green button */
+            color: #1a202c; /* Dark text on green */
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            transition: background-color 0.3s ease;
+        }
+        .button-primary:hover:not(:disabled) {
+            background-color: #2fb380; /* Darker green on hover */
+        }
+        .button-primary:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        .list-item-hover:hover {
+            background-color: #2d3643; /* Darker gray on hover for list items */
+        }
+        .list-item-active {
+             background-color: #4a5568; /* Darker gray for active state if needed */
+        }
+    </style>
+</head>
+<body class="p-4 sm:p-6 md:p-8">
+
+    <div class="max-w-6xl mx-auto py-8 text-center">
+        <h1 class="text-4xl sm:text-5xl font-bold mb-4 header-gradient">Emotion-Driven Audience Intelligence AI</h1>
+        <p class="text-lg text-gray-300 mb-10 text-center">
+            Analyze audience by industry or emotional response. Choose your analysis perspective to uncover insights about audience reader engagement and content impact.
+        </p>
+
+        <!-- Main Content Grid -->
+        <main class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+            <!-- Filter & Controls Section -->
+            <section class="lg:col-span-1 card p-6">
+                <h2 class="text-2xl font-semibold mb-4">Analysis Perspective</h2>
+
+                <div class="mb-6">
+                    <label class="inline-flex items-center mr-4 cursor-pointer">
+                        <input type="radio" name="filterType" value="industry" class="form-radio" checked>
+                        <span class="ml-2 text-gray-300">Industry Analysis</span>
+                    </label>
+                    <label class="inline-flex items-center cursor-pointer">
+                        <input type="radio" name="filterType" value="emotion" class="form-radio">
+                        <span class="ml-2 text-gray-300">Emotion Analysis</span>
+                    </label>
+                </div>
+
+                <!-- Industry Filter -->
+                <div id="industryFilter" class="mb-6">
+                    <label for="selectIndustry" class="block text-gray-400 text-sm font-bold mb-2">
+                        Select an Industry to analyze
+                    </label>
+                    <select id="selectIndustry" class="shadow appearance-none border rounded w-full py-2 px-3 leading-tight focus:outline-none focus:shadow-outline bg-gray-700 border-gray-600 text-gray-200">
+                        <!-- Options will be populated by JS -->
+                    </select>
+                </div>
+
+                <!-- Emotion Filter -->
+                <div id="emotionFilter" class="mb-6 hidden">
+                    <label for="selectEmotion" class="block text-gray-400 text-sm font-bold mb-2">
+                        Select an Emotion to analyze
+                    </label>
+                    <select id="selectEmotion" class="shadow appearance-none border rounded w-full py-2 px-3 leading-tight focus:outline-none focus:shadow-outline bg-gray-700 border-gray-600 text-gray-200">
+                        <!-- Options will be populated by JS -->
+                    </select>
+                </div>
+
+            </section>
+
+            <!-- Dashboard Insights Section -->
+            <section class="lg:col-span-2 card p-6">
+                <h2 class="text-2xl font-semibold mb-4">Dashboard Insights</h2>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                    <div id="topEmotionsCard" class="bg-gray-800 p-4 rounded-md">
+                        <h3 class="text-lg font-semibold text-green-400 mb-2">Top 5 Emotions</h3>
+                        <ul id="topEmotionsList" class="text-gray-300">
+                            <li>Loading...</li>
+                        </ul>
+                    </div>
+                    <div id="topIndustriesCard" class="bg-gray-800 p-4 rounded-md">
+                        <h3 class="text-lg font-semibold text-blue-400 mb-2">Top 5 Industries</h3>
+                        <ul id="topIndustriesList" class="text-gray-300">
+                            <li>Loading...</li>
+                        </ul>
+                    </div>
+                    <div class="bg-gray-800 p-4 rounded-md">
+                        <h3 class="text-lg font-semibold text-purple-400 mb-2">Top 5 Topics</h3>
+                        <ul id="topTopicsList" class="text-gray-300">
+                            <li>Loading...</li>
+                        </ul>
+                    </div>
+                    <div class="bg-gray-800 p-4 rounded-md">
+                        <h3 class="text-lg font-semibold text-yellow-400 mb-2">Target Generation</h3>
+                        <p id="targetGeneration" class="text-gray-300 text-lg">Loading...</p>
+                    </div>
+                    <div class="bg-gray-800 p-4 rounded-md md:col-span-2">
+                        <h3 class="text-lg font-semibold text-pink-400 mb-2">Top 5 Site Sections</h3>
+                        <ul id="topSiteSectionsList" class="text-gray-300">
+                            <li>Loading...</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+           
+            <!-- AI Sales Pitch Section -->
+            <section class="lg:col-span-3 card p-8 bg-gradient-to-br from-gray-800 to-gray-900">
+
+                <div class="text-center mb-6">
+<div class="inline-flex items-center justify-center w-10 h-10 bg-gradient-to-r from-gray-400 via-green-300 to-blue-400 rounded-full mb-4">
+    <svg class="w-6 h-6 text-white opacity-90" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 00-2.456 2.456zM16.894 20.567L16.5 21.75l-.394-1.183a2.25 2.25 0 00-1.423-1.423L13.5 18.75l1.183-.394a2.25 2.25 0 001.423-1.423L16.5 15.75l.394 1.183a2.25 2.25 0 001.423 1.423L19.5 18.75l-1.183.394a2.25 2.25 0 00-1.423 1.423z"></path>
+    </svg>
+</div>
+
+
+                    <h2 class="text-3xl font-bold mb-2 header-gradient">AI Sales Pitch Generator</h2>
+                    <p class="text-gray-400 text-base max-w-4xl mx-auto">
+                        The AI analyzes and top-ranking metrics, then creates targeted B2B sales pitch sumary for selected audience filter.
+                    </p>
+                </div>
+                
+                <div class="flex justify-center mb-6">
+                    <button id="generatePitchBtn" class="button-primary text-lg px-8 py-4 shadow-lg transform transition-all duration-200 hover:scale-105 hover:shadow-xl">
+                        <span class="flex items-center">
+                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
+                            </svg>
+                            Generate AI Sales Pitch
+                        </span>
+                    </button>
+                </div>
+                
+                <div id="pitchLoading" class="hidden text-center mb-4">
+                    <div class="inline-flex items-center text-green-400 text-lg">
+                        <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-green-400 mr-3"></div>
+                        Generating your personalized pitch...
+                    </div>
+                </div>
+                
+                <div id="pitchError" class="text-red-400 text-center mb-4 hidden"></div>
+                
+                <div class="bg-gray-800 border border-gray-600 rounded-lg p-6 min-h-[150px]">
+                    <div class="flex items-start mb-3">
+                        <div class="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center mr-3" style="background-color: #22d3ee;">
+                            <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-1l-4 4z"></path>
+                            </svg>
+                        </div>
+                        <h3 class="text-lg font-semibold text-gray-200">Your Personalized Sales Pitch</h3>
+                    </div>
+                    <div id="salesPitchOutput" class="text-gray-300 leading-relaxed text-left prose prose-invert max-w-none">
+                        <div class="flex items-center justify-center h-20 text-gray-500">
+                            <div class="text-center">
+                                <svg class="w-12 h-12 mx-auto mb-2 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                                </svg>
+                                <p>Click "Generate AI Sales Pitch" to create your targeted pitch</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mt-4 text-center text-sm text-gray-500">
+                    <p>💡<strong>Tip:</strong> Adjust your filters above to target specific industries, emotions for more precise pitches</p>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+
+    <script>
+        // --- CONFIGURATION ---
+        const JSON_DATA_PATH = 'article_emotions_data.json';
+        const GEMINI_API_KEY = "AIzaSyDjG2hEnsqcTdudGBACaKFfi1sIRFrcAEU"; 
+
+        // --- GLOBAL VARIABLES ---
+        let allArticleData = [];
+        let currentFilteredArticles = [];
+        let currentFilterType = 'industry';
+        let currentFilterValue = '';
+
+        // --- Data Key Mapping ---
+        const DATA_KEY_MAPPING = {
+            'industry': 'target_industries_1', 
+            'emotion': 'emotion_segments_1',   
+            'topic': 'core_topics_themes_1',   
+            'generation': 'generational_groups_1', 
+            'site_section': 'art_section',     
+            'pageviews': 'pageviews',          
+            'users': 'users',                  
+            'attention_time_mins': 'attention_time_mins' 
+        };
+
+        // --- Helper Functions ---
+        function normalizeValue(value) {
+            return (value === null || value === undefined || value === '') ? '' : String(value).toLowerCase().trim();
+        }
+
+        function populateDropdown(selectElement, options) {
+            selectElement.innerHTML = '<option value="">All</option>';
+            options.forEach(option => {
+                const opt = document.createElement('option');
+                opt.value = normalizeValue(option); 
+                opt.textContent = option;
+                selectElement.appendChild(opt);
+            });
+        }
+
+        function toggleFilterVisibility() {
+            const selectedFilterType = document.querySelector('input[name="filterType"]:checked').value;
+            const industryFilterDiv = document.getElementById('industryFilter');
+            const emotionFilterDiv = document.getElementById('emotionFilter');
+            
+            console.log('Filter type changed to:', selectedFilterType);
+            
+            if (selectedFilterType === 'industry') {
+                industryFilterDiv.classList.remove('hidden');
+                emotionFilterDiv.classList.add('hidden');
+                console.log('Showing industry filter, hiding emotion filter');
+            } else if (selectedFilterType === 'emotion') {
+                industryFilterDiv.classList.add('hidden');
+                emotionFilterDiv.classList.remove('hidden');
+                console.log('Showing emotion filter, hiding industry filter');
+            }
+            
+            // Toggle cards visibility based on filter type
+            toggleCardsVisibility();
+        }
+
+        function toggleCardsVisibility() {
+            const selectedFilterType = document.querySelector('input[name="filterType"]:checked').value;
+            const topEmotionsCard = document.getElementById('topEmotionsCard');
+            const topIndustriesCard = document.getElementById('topIndustriesCard');
+            
+            if (selectedFilterType === 'industry') {
+                // Hide top industries card when filtering by industry
+                topIndustriesCard.classList.add('hidden');
+                topEmotionsCard.classList.remove('hidden');
+            } else if (selectedFilterType === 'emotion') {
+                // Hide top emotions card when filtering by emotion
+                topEmotionsCard.classList.add('hidden');
+                topIndustriesCard.classList.remove('hidden');
+            }
+        }
+
+        async function filterDataAndRender() {
+            console.log('--- filterDataAndRender started ---');
+            currentFilterType = document.querySelector('input[name="filterType"]:checked').value;
+            
+            const selectIndustry = document.getElementById('selectIndustry');
+            const selectEmotion = document.getElementById('selectEmotion');
+            currentFilterValue = normalizeValue(currentFilterType === 'industry' ? selectIndustry.value : selectEmotion.value); 
+
+            console.log(`Filter Type: ${currentFilterType}, Filter Value (normalized): "${currentFilterValue}"`);
+
+            const actualFilterKey = DATA_KEY_MAPPING[currentFilterType];
+            console.log(`Actual JSON Key for filter: ${actualFilterKey}`);
+
+            if (currentFilterValue === "") {
+                currentFilteredArticles = [...allArticleData];
+                console.log('No filter value selected, showing all data. Total: ' + currentFilteredArticles.length);
+            } else {
+                currentFilteredArticles = allArticleData.filter(article => {
+                    const articleValue = article[actualFilterKey];
+                    let valuesToProcess = [];
+                    
+                    if (typeof articleValue === 'string' && articleValue.startsWith('[') && articleValue.endsWith(']')) {
+                        try {
+                            const parsed = JSON.parse(articleValue.replace(/'/g, '"'));
+                            if (Array.isArray(parsed)) {
+                                valuesToProcess = parsed.filter(Boolean).map(normalizeValue);
+                            } else {
+                                valuesToProcess = [normalizeValue(articleValue)];
+                            }
+                        } catch (e) {
+                            console.warn("Failed to parse stringified array, treating as single string:", articleValue, e);
+                            valuesToProcess = [normalizeValue(articleValue)];
+                        }
+                    } else if (Array.isArray(articleValue)) {
+                        valuesToProcess = articleValue.filter(Boolean).map(normalizeValue);
+                    } else {
+                        valuesToProcess = (articleValue !== null && articleValue !== undefined && articleValue !== '' ? [normalizeValue(articleValue)] : []);
+                    }
+                    
+                    return valuesToProcess.some(val => val === currentFilterValue);
+                });
+                console.log(`Filtered to ${currentFilteredArticles.length} articles.`);
+            }
+
+            const topEmotions = calculateTopMetrics(currentFilteredArticles, 'emotion', 'pageviews');
+            const topIndustries = calculateTopMetrics(currentFilteredArticles, 'industry', 'pageviews');
+            const topTopics = calculateTopMetrics(currentFilteredArticles, 'topic', 'pageviews');
+            const targetGeneration = calculateMostCommon(currentFilteredArticles, 'generation');
+            const topSiteSections = calculateTopMetrics(currentFilteredArticles, 'site_section', 'pageviews');
+
+            renderList(document.getElementById('topEmotionsList'), topEmotions);
+            renderList(document.getElementById('topIndustriesList'), topIndustries);
+            renderList(document.getElementById('topTopicsList'), topTopics);
+            document.getElementById('targetGeneration').textContent = targetGeneration;
+            renderList(document.getElementById('topSiteSectionsList'), topSiteSections);
+
+            const salesPitchOutput = document.getElementById('salesPitchOutput');
+            salesPitchOutput.textContent = 'Click "Generate AI Sales Pitch" to get insights.';
+            salesPitchOutput.classList.remove('text-red-400');
+            document.getElementById('pitchError').classList.add('hidden');
+            console.log('--- filterDataAndRender finished ---');
+        }
+
+        function renderList(listElement, items) {
+            listElement.innerHTML = '';
+            if (!items || items.length === 0 || (items.length === 1 && items[0].includes('No data for this filter.'))) {
+                listElement.innerHTML = '<li class="text-gray-500">No data for this filter.</li>';
+                return;
+            }
+            items.forEach(item => {
+                const li = document.createElement('li');
+                li.className = 'p-2 rounded-md list-item-hover';
+                li.textContent = item;
+                listElement.appendChild(li);
+            });
+        }
+
+        function calculateTopMetrics(data, key, metric = 'pageviews') {
+            const actualKey = DATA_KEY_MAPPING[key];
+            const actualMetric = DATA_KEY_MAPPING[metric]; 
+
+            const counts = {};
+            data.forEach(item => {
+                const rawValue = item[actualKey];
+                const score = parseFloat(item[actualMetric]) || 0;
+
+                let valuesToProcess = [];
+                if (typeof rawValue === 'string' && rawValue.startsWith('[') && rawValue.endsWith(']')) {
+                    try {
+                        const parsed = JSON.parse(rawValue.replace(/'/g, '"'));
+                        if (Array.isArray(parsed)) {
+                            valuesToProcess = parsed.filter(Boolean).map(normalizeValue);
+                        } else {
+                            valuesToProcess = [normalizeValue(rawValue)];
+                        }
+                    } catch (e) {
+                        valuesToProcess = [normalizeValue(rawValue)];
+                    }
+                } else if (typeof rawValue === 'string') {
+                    valuesToProcess = [normalizeValue(rawValue)];
+                } else if (Array.isArray(rawValue)) {
+                    valuesToProcess = rawValue.filter(Boolean).map(normalizeValue);
+                } else {
+                    valuesToProcess = rawValue != null ? [normalizeValue(rawValue)] : [];
+                }
+                
+                valuesToProcess.forEach(value => {
+                    if (value !== '') {
+                        counts[value] = (counts[value] || 0) + score;
+                    }
+                });
+            });
+
+            const sortedItems = Object.entries(counts)
+                .sort(([, countA], [, countB]) => countB - countA)
+                .slice(0, 5);
+
+            // Return just the names without numbers
+            return sortedItems.map(([name, count]) => name);
+        }
+
+        function calculateMostCommon(data, key) {
+            const actualKey = DATA_KEY_MAPPING[key];
+            const counts = {};
+            data.forEach(item => {
+                const rawValue = item[actualKey];
+                
+                let valuesToProcess = [];
+                if (typeof rawValue === 'string' && rawValue.startsWith('[') && rawValue.endsWith(']')) {
+                    try {
+                        const parsed = JSON.parse(rawValue.replace(/'/g, '"'));
+                        if (Array.isArray(parsed)) {
+                            valuesToProcess = parsed.filter(Boolean).map(normalizeValue);
+                        } else {
+                            valuesToProcess = [normalizeValue(rawValue)];
+                        }
+                    } catch (e) {
+                        valuesToProcess = [normalizeValue(rawValue)];
+                    }
+                } else if (Array.isArray(rawValue)) {
+                    valuesToProcess = rawValue.filter(Boolean).map(normalizeValue);
+                } else {
+                    valuesToProcess = (rawValue !== null && rawValue !== undefined && rawValue !== '' ? [normalizeValue(rawValue)] : []);
+                }
+
+                valuesToProcess.forEach(value => {
+                     if (value !== '') {
+                        counts[value] = (counts[value] || 0) + 1;
+                    }
+                });
+            });
+
+            const sortedItems = Object.entries(counts)
+                .sort(([, countA], [, countB]) => countB - countA);
+
+            return sortedItems.length > 0 ? sortedItems[0][0] : 'N/A';
+        }
+
+        async function generateAISalesPitch() {
+            const salesPitchOutput = document.getElementById('salesPitchOutput');
+            const pitchLoading = document.getElementById('pitchLoading');
+            const generatePitchBtn = document.getElementById('generatePitchBtn');
+            const pitchError = document.getElementById('pitchError');
+            
+            if (!GEMINI_API_KEY || GEMINI_API_KEY === "YOUR_GEMINI_API_KEY_HERE") {
+                salesPitchOutput.textContent = "Error: Gemini API Key is missing or default. Please add your key in the JavaScript code.";
+                salesPitchOutput.classList.add('text-red-400');
+                return;
+            }
+
+            if (!currentFilteredArticles || currentFilteredArticles.length === 0) {
+                salesPitchOutput.textContent = "No data to generate a pitch. Please select a filter with matching articles.";
+                salesPitchOutput.classList.add('text-red-400');
+                return;
+            }
+
+            const currentFilterDesc = currentFilterValue ? `${currentFilterType}: ${currentFilterValue}` : 'All Content';
+            const topEmotions = calculateTopMetrics(currentFilteredArticles, 'emotion');
+            const topIndustries = calculateTopMetrics(currentFilteredArticles, 'industry');
+            const topTopics = calculateTopMetrics(currentFilteredArticles, 'topic');
+            const targetGeneration = calculateMostCommon(currentFilteredArticles, 'generation');
+            const topSiteSections = calculateTopMetrics(currentFilteredArticles, 'site_section');
+
+            const formatForPrompt = (items) => {
+                if (!items || items.length === 0 || (items.length === 1 && items[0].includes('No data for this filter.'))) {
+                    return 'N/A';
+                }
+                return items.join(', ');
+            };
+
+            const prompt = `
+            As an expert B2B advertising sales strategist, generate a concise (max 150 words), persuasive sales pitch summary for an advertiser in very simple and easy english.
+            The pitch should be based on the following filtered insights from a news publisher's article performance data for "${currentFilterDesc}".
+            This data reflects ${currentFilteredArticles.length} relevant audience reach from the content.
+
+            Insights:
+            - Top 5 Emotions triggered by content: ${formatForPrompt(topEmotions)}
+            - Top 5 Industries covered by content: ${formatForPrompt(topIndustries)}
+            - Top 5 Topics covered by content: ${formatForPrompt(topTopics)}
+            - Primary Target Generation: ${targetGeneration || 'N/A'}
+            - Top 5 Site Sections: ${formatForPrompt(topSiteSections)}
+
+            Highlight the unique audience group proposition for B2B advertisers interested in reaching engaged audiences and their feelings meotions.
+            Focus on data-driven potential for lead generation and brand influence and the reach.
+            Start directly with the pitch, no conversational filler.
+            `;
+
+            pitchLoading.classList.remove('hidden');
+            generatePitchBtn.disabled = true;
+            salesPitchOutput.textContent = '';
+            pitchError.classList.add('hidden');
+
+            const payload = {
+                contents: [{ role: "user", parts: [{ text: prompt }] }],
+                generationConfig: {
+                    temperature: 0.7,
+                    maxOutputTokens: 300
+                }
+            };
+
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`;
+            let responseText = '';
+            let attempts = 0;
+            const maxAttempts = 5;
+            let delay = 1000;
+
+            while (attempts < maxAttempts) {
+                try {
+                    const response = await fetch(apiUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+
+                    if (!response.ok) {
+                        if (response.status === 429 || response.status >= 500) {
+                            console.warn(`Gemini API Error (${response.status}). Retrying in ${delay / 1000}s...`);
+                            await new Promise(res => setTimeout(res, delay));
+                            delay *= 2;
+                            attempts++;
+                            continue;
+                        }
+                        const errorData = await response.json();
+                        throw new Error(`Gemini API Error: ${response.status} ${response.statusText} - ${JSON.stringify(errorData)}`);
+                    }
+
+                    const result = await response.json();
+                    if (result.candidates && result.candidates.length > 0 &&
+                        result.candidates[0].content && result.candidates[0].content.parts &&
+                        result.candidates[0].content.parts.length > 0) {
+                        responseText = result.candidates[0].content.parts[0].text;
+                        break;
+                    } else {
+                        throw new Error("Unexpected Gemini API response structure or no candidates.");
+                    }
+                } catch (error) {
+                    console.error("Error calling Gemini API:", error);
+                    responseText = `Error generating pitch: ${error.message}. Please check console for details.`;
+                    break;
+                } finally {
+                    pitchLoading.classList.add('hidden');
+                    generatePitchBtn.disabled = false;
+                }
+            }
+
+            salesPitchOutput.textContent = responseText;
+            if (responseText.includes("Error generating pitch") || responseText.includes("Error calling Gemini API")) {
+                salesPitchOutput.classList.add('text-red-400');
+            } else {
+                salesPitchOutput.classList.remove('text-red-400');
+            }
+        }
+
+        // --- INITIALIZATION AND EVENT LISTENERS ---
+        document.addEventListener('DOMContentLoaded', async () => {
+            console.log('DOM Content Loaded - Initializing...');
+            
+            // Set up radio button event listeners
+            const filterTypeRadios = document.querySelectorAll('input[name="filterType"]');
+            filterTypeRadios.forEach(radio => {
+                radio.addEventListener('change', () => {
+                    console.log('Radio button changed:', radio.value);
+                    toggleFilterVisibility();
+                    filterDataAndRender();
+                });
+            });
+
+            // Set up dropdown event listeners
+            document.getElementById('selectIndustry').addEventListener('change', filterDataAndRender);
+            document.getElementById('selectEmotion').addEventListener('change', filterDataAndRender);
+            
+            // Set up button event listener
+            document.getElementById('generatePitchBtn').addEventListener('click', generateAISalesPitch);
+            
+            // Set initial filter visibility
+            toggleFilterVisibility();
+
+            // Load data
+            const salesPitchOutput = document.getElementById('salesPitchOutput');
+            salesPitchOutput.textContent = 'Loading data...';
+
+            try {
+                const response = await fetch(JSON_DATA_PATH);
+                if (!response.ok) {
+                    throw new Error(`Failed to load data from ${JSON_DATA_PATH}. Status: ${response.status}`);
+                }
+                allArticleData = await response.json();
+                
+                const uniqueIndustries = [...new Set(allArticleData.flatMap(d => {
+                    const value = d[DATA_KEY_MAPPING['industry']];
+                    if (typeof value === 'string' && value.startsWith('[') && value.endsWith(']')) {
+                        try {
+                            const parsedArray = JSON.parse(value.replace(/'/g, '"')); 
+                            return Array.isArray(parsedArray) ? parsedArray.filter(Boolean) : [];
+                        } catch (e) {
+                            console.warn("Could not parse stringified array for industry dropdown, treating as single string:", value, e);
+                            return [value];
+                        }
+                    }
+                    return Array.isArray(value) ? value.filter(Boolean) : (value !== null && value !== undefined && value !== '' ? [value] : []);
+                }).filter(Boolean))].sort();
+
+                const uniqueEmotions = [...new Set(allArticleData.flatMap(d => {
+                    const value = d[DATA_KEY_MAPPING['emotion']];
+                    if (typeof value === 'string' && value.startsWith('[') && value.endsWith(']')) {
+                        try {
+                            const parsedArray = JSON.parse(value.replace(/'/g, '"'));
+                            return Array.isArray(parsedArray) ? parsedArray.filter(Boolean) : [];
+                        } catch (e) {
+                            console.warn("Could not parse stringified array for emotion dropdown, treating as single string:", value, e);
+                            return [value];
+                        }
+                    }
+                    return Array.isArray(value) ? value.filter(Boolean) : (value !== null && value !== undefined && value !== '' ? [value] : []);
+                }).filter(Boolean))].sort();
+
+                const selectIndustry = document.getElementById('selectIndustry');
+                const selectEmotion = document.getElementById('selectEmotion');
+                populateDropdown(selectIndustry, uniqueIndustries);
+                populateDropdown(selectEmotion, uniqueEmotions);
+
+                salesPitchOutput.textContent = 'Data loaded. Select filters or generate pitch.';
+                salesPitchOutput.classList.remove('text-red-400');
+
+            } catch (error) {
+                console.error("Error loading initial JSON data:", error);
+                salesPitchOutput.textContent = `Error loading initial data: ${error.message}. Make sure '${JSON_DATA_PATH}' exists and is a valid JSON file.`;
+                salesPitchOutput.classList.add('text-red-400');
+                document.getElementById('generatePitchBtn').disabled = true;
+            } finally {
+                await filterDataAndRender();
+            }
+        });
+    </script>
+</body>
+</html>
